@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block stylebox %}
+.custombutton {
+    border: none;
+    background: none;
+}
+.profilebox {
+    display: inline-block;
+    padding: 2px;
+    background-color: lightgray;
+    border: 1px lightgray solid;
+    border-radius: 10px;
+    text-align: center;
+}
+.div-container div {
+    display: inline-block;
+}
+{% endblock stylebox %}
+
+{% block content %}
+<div class="div-container">
+    <div>
+        <h1>{{person.username}}님의 프로필</h1>
+    </div>
+    <div>
+    {% if user != person %}
+    <form action="{% url "accounts:follow" person.pk %}" method="POST">
+        {% csrf_token %}
+        {% if request.user in person.followers.all %}
+            <button type="submit" class="custombutton">
+                <i class="fa-solid fa-heart fa-beat-fade fa-2xl"></i>
+            </button>
+        {% else %}
+            <button type="submit" class="custombutton">
+                <i class="fa-regular fa-heart fa-bounce fa-2xl"></i>            
+            </button>
+        {% endif %}
+    </form>
+    {% endif %} 
+    </div>
+</div>
+
+<div class="flex my-3">
+    <div class="profilebox"><p class="my-1">{{person.board_set.all | length}}</p><p>작성한 글</p></div>
+    <div class="profilebox"><p class="my-1">{{person.followings.all | length}}</p><p>following</p></div>
+    <div class="profilebox"><p class="my-1">{{person.followers.all | length}}</p><p>followers</p></div>
+</div>
+<p>회원번호: {{person.pk}}</p>
+<p>가입날짜: {{person.date_joined}}</p>
+<br>
+<hr>
+<h3>유저가 쓴 글</h3>
+{% for board in person.board_set.all %}
+<div class="card my-3 mx-1">
+    <div class="card-body">
+    <h5 class="card-title">{{ board.title }}</h5>
+    <p class="card-subtitle mb-2 text-body-secondary">{{ board.id }}번째 글</p>
+    <a href="{% url 'boards:detail' board.id %}" class="card-link">보러가기</a>
+    </div>
+</div>
+{% endfor %}
+<hr>
+<h3>유저가 쓴 댓글</h3>
+
+{% for comment in person.comment_set.all %}
+<div class="card my-3 mx-1">
+    <div class="card-body">
+        <h5 class="card-title">{{ comment.board.title }}</h5>
+        <p class="card-subtitle mb-2 text-body-secondary">{{ comment.content }}</p>
+    </div>
+</div>
+{% endfor %}
+<br>
+<hr>
+<h3>팔로워</h3>
+{% for follower in person.followers.all %}
+    <div>
+        <p>{{follower}}</p>
+    </div>
+{% endfor %}
+{% endblock content %}
